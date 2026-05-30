@@ -1,7 +1,22 @@
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const BST_TIMEZONE = "Asia/Dhaka"; // Bangladesh Standard Time
 
 export function pad2(value) {
   return String(value).padStart(2, "0");
+}
+
+export function getDateInTimezone(date, timezone) {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(date);
+  const year = parts.find((p) => p.type === "year").value;
+  const month = parts.find((p) => p.type === "month").value;
+  const day = parts.find((p) => p.type === "day").value;
+  return `${year}-${month}-${day}`;
 }
 
 export function getTodayLocalDate() {
@@ -27,7 +42,7 @@ export function normalizeLocalDate(value) {
   }
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) throw new Error("Invalid date");
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+  return getDateInTimezone(date, BST_TIMEZONE);
 }
 
 export function toDateRange({ date, startDate, endDate }) {
@@ -42,7 +57,11 @@ export function toDateRange({ date, startDate, endDate }) {
 }
 
 export function getWeekRangeLocal(baseDate = new Date()) {
-  const date = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+  const date = new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+  );
   const day = date.getDay();
   const diffToMonday = day === 0 ? -6 : 1 - day;
   const start = new Date(date);

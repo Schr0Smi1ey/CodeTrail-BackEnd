@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import { requireAuth } from "./middleware/authMiddleware.js";
+import authRoutes from "./routes/authRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import checkinRoutes from "./routes/checkinRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
 app.get("/api/health", (req, res) => res.json({ ok: true, app: "CodeTrail" }));
 app.use("/api", requireAuth);
+app.use("/api/auth", authRoutes);
 app.use("/api/tracks", trackRoutes);
 app.use("/api/topics", topicRoutes);
 app.use("/api/resources", resourceRoutes);

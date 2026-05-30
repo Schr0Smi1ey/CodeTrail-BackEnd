@@ -7,7 +7,7 @@ Express + MongoDB API for CodeTrail.
 - REST API for tracks, topics, resources, check-ins, stats, heatmaps
 - MongoDB/Mongoose models
 - Firebase Admin authentication
-- Allowed-email access control
+- Verified-email access control
 - Vercel serverless deployment
 
 ## Setup
@@ -25,7 +25,7 @@ PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/codetrail
 CLIENT_ORIGIN=http://localhost:5173
 FIREBASE_PROJECT_ID=codetrail-karim
-ALLOWED_EMAILS=your-email@example.com
+FIREBASE_SERVICE_ACCOUNT_KEY={"project_id":"codetrail-karim","client_email":"firebase-adminsdk@example.iam.gserviceaccount.com","private_key":"-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n"}
 ```
 
 ## Auth
@@ -36,7 +36,9 @@ All app APIs require:
 Authorization: Bearer <firebase-id-token>
 ```
 
-Only emails listed in `ALLOWED_EMAILS` can access data.
+Any user with a valid Firebase ID token and verified email can access data.
+
+For Vercel, set `FIREBASE_SERVICE_ACCOUNT_KEY` to the Firebase service account JSON on one line. Keep escaped newlines in `private_key` as `\\n`.
 
 Public endpoint:
 

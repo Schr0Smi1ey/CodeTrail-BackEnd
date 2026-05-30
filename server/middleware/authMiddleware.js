@@ -1,12 +1,5 @@
 import { getFirebaseAuth } from "../config/firebaseAdmin.js";
 
-function getAllowedEmails() {
-  return (process.env.ALLOWED_EMAILS || "")
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
-
 export async function requireAuth(req, res, next) {
   try {
     const header = req.headers.authorization || "";
@@ -18,10 +11,9 @@ export async function requireAuth(req, res, next) {
 
     const decoded = await getFirebaseAuth().verifyIdToken(token);
     const email = decoded.email?.toLowerCase();
-    const allowedEmails = getAllowedEmails();
 
-    if (!email || !allowedEmails.includes(email)) {
-      return res.status(403).json({ message: "This account is not allowed" });
+    if (!email) {
+      return res.status(403).json({ message: "Email address required" });
     }
 
     if (!decoded.email_verified) {
@@ -35,6 +27,13 @@ export async function requireAuth(req, res, next) {
     };
     next();
   } catch (error) {
-    res.status(401).json({ message: "Invalid or expired session" });
+    console.error("Firebase auth verification failed", {
+      code: error.code,
+      message: error.message,
+    });
+    res.status(401).json({
+      message: "Invalid or expired session",
+      ...(process.env.NODE_ENV === "production" ? {} : { detail: error.message, code: error.code }),
+    });
   }
 }
